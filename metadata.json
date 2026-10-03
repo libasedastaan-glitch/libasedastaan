@@ -1,0 +1,6 @@
+{
+  "name": "NexusCommerce - Modern Full-Stack Store & TailAdmin",
+  "description": "Production-ready full-stack eCommerce application with Next.js App Router architecture, Supabase database & auth, Stripe & COD payments, and TailAdmin admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

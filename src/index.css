@@ -1,0 +1,89 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  /* Map Tailwind's font-sans / font-serif utilities to the brand typefaces */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+
+  --animate-fade-in: fade-in 0.25s ease-out;
+  --animate-shake: shake 0.4s ease-in-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+}
+
+@layer base {
+  :root {
+    --brand-accent: #3B2314;      /* Deep Sepia / Espresso */
+    --brand-base: #FAF6F0;        /* Warm Cream Off-White */
+    --brand-neutral: #D8CEC4;     /* Soft Taupe Separator Line */
+    --brand-cta: #9E5A38;         /* Burnished Bronze / Rich Terracotta */
+    --brand-cta-hover: #884A2B;
+    --brand-sage: #526A50;        /* Earthy Sage Green */
+    --brand-sage-bg: #EDF3EC;
+    --brand-rose: #8F423B;        /* Dusty Rose / Venetian Red */
+    --brand-rose-bg: #F9EFEF;
+  }
+
+  body {
+    background-color: #FAF6F0;
+    color: #3B2314;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+    color: #3B2314;
+  }
+}
+
+/* Custom Luxury Typography & Utility Classes */
+.font-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-urdu {
+  font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
+}
+
+/* Luxury Card & Shadow Utilities */
+/* Declared with @utility so variants like hover:shadow-luxury-hover work */
+@utility shadow-luxury {
+  box-shadow: 0 4px 20px -2px rgba(59, 35, 20, 0.05), 0 2px 6px -1px rgba(59, 35, 20, 0.03);
+}
+
+@utility shadow-luxury-hover {
+  box-shadow: 0 12px 30px -4px rgba(59, 35, 20, 0.09), 0 4px 10px -2px rgba(59, 35, 20, 0.04);
+}
+
+/* Scrollbar styling matching Cream & Taupe */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF6F0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8CEC4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #BFAFA0;
+}
