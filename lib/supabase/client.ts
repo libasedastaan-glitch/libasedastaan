@@ -1,34 +1,31 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Resolve Supabase credentials from runtime environment, Vite defines, or user config
+// Resolve Supabase credentials from .env / Vercel env vars (injected via `define` in vite.config.ts)
 export const getSupabaseConfig = () => {
-  const url =
-    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) ||
-    (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_URL) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_SUPABASE_URL) ||
-    'https://fawanfeqhwrlddflwvjy.supabase.co';
+  const url: string = import.meta.env.SUPABASE_URL || '';
+  const key: string = import.meta.env.SUPABASE_ANON_KEY || '';
 
-  const key =
-    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
-    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-    (typeof process !== 'undefined' && process.env?.SUPABASE_ANON_KEY) ||
-    (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_PUBLISHABLE_KEY) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-    'sb_publishable_Arf-6FIXbhsHYW0lIJu6bw_5YmkTe3h';
+  if (!url || !key) {
+    console.warn(
+      'Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file.'
+    );
+  }
 
-  return { url, key, isConfigured: Boolean(url && key && !url.includes('placeholder')) };
+  return { url, key, isConfigured: Boolean(url && key) };
 };
 
 const config = getSupabaseConfig();
 
-export const supabase = createClient(config.url, config.key, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+export const supabase = createClient(
+  config.url || 'http://localhost',
+  config.key || 'missing-key',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  }
+);
 
 export const isSupabaseLive = () => config.isConfigured;
 export const getActiveSupabaseUrl = () => config.url;

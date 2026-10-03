@@ -9,6 +9,7 @@ interface NavbarProps {
   currentUser: UserProfile;
   activeCategory: string;
   onSelectCategory: (slug: string) => void;
+  onGoHome?: () => void;
   onOpenCart: () => void;
   onOpenProfile: () => void;
   onNavigateToAdmin: () => void;
@@ -23,6 +24,7 @@ export const Navbar = ({
   cartCount,
   activeCategory,
   onSelectCategory,
+  onGoHome,
   onOpenCart,
   onOpenProfile,
   onNavigateToAdmin,
@@ -48,7 +50,7 @@ export const Navbar = ({
 
             {/* Brand Logo with exact typography from attached logo */}
             <button
-              onClick={() => onSelectCategory('all')}
+              onClick={() => (onGoHome ? onGoHome() : onSelectCategory('all'))}
               className="group text-left transition-opacity hover:opacity-90"
               aria-label="Libas e Dastaan Home"
             >

@@ -286,13 +286,12 @@ export default function App() {
   };
 
   // --- Filtered Products for Storefront ---
+  const selectedCategory = categories.find((c) => c.slug === activeCategory);
   const filteredStoreProducts = products.filter((p) => {
     const matchesCategory =
       activeCategory === 'all' ||
-      (activeCategory === 'audio-tech' && p.category_id?.includes('audio')) ||
-      (activeCategory === 'minimalist-living' && p.category_id?.includes('minimalist')) ||
-      (activeCategory === 'premium-wear' && p.category_id?.includes('premium')) ||
-      (activeCategory === 'workspace-desk' && p.category_id?.includes('workspace'));
+      (!!selectedCategory &&
+        (p.category_id === selectedCategory.id || p.category?.slug === selectedCategory.slug));
 
     const matchesSearch =
       !searchQuery ||
@@ -301,6 +300,14 @@ export default function App() {
 
     return matchesCategory && matchesSearch;
   });
+
+  // Select a category and bring the product section into view
+  const handleSelectCategory = (slug: string) => {
+    setActiveCategory(slug);
+    requestAnimationFrame(() => {
+      document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
+    });
+  };
 
   // Sort products
   const sortedProducts = [...filteredStoreProducts].sort((a, b) => {
@@ -331,7 +338,11 @@ export default function App() {
             cartCount={cartCount}
             currentUser={currentUser}
             activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
+            onSelectCategory={handleSelectCategory}
+            onGoHome={() => {
+              setActiveCategory('all');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onOpenCart={() => setCartOpen(true)}
             onOpenProfile={() => setProfileOpen(true)}
             onNavigateToAdmin={() => setCurrentView('admin')}
@@ -344,8 +355,9 @@ export default function App() {
           {/* Hero Banner */}
           <HeroBanner
             categories={categories}
+            products={products}
             activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
+            onSelectCategory={handleSelectCategory}
             onExploreProducts={() => {
               const el = document.getElementById('catalog-section');
               el?.scrollIntoView({ behavior: 'smooth' });

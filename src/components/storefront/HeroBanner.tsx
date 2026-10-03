@@ -1,19 +1,58 @@
-import { ArrowRight, ChevronRight, Award, Sparkles, Feather } from 'lucide-react';
-import { Category } from '../../types/index.ts';
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowRight, ChevronRight, ChevronLeft, Award, Sparkles, Feather } from 'lucide-react';
+import { Category, Product } from '../../types/index.ts';
 import { BrandLogo } from '../ui/BrandLogo.tsx';
 
 interface HeroBannerProps {
   categories: Category[];
+  products: Product[];
   activeCategory: string;
   onSelectCategory: (slug: string) => void;
   onExploreProducts: () => void;
   onNavigateToAdmin: () => void;
 }
 
+const FALLBACK_SLIDE = {
+  id: 'fallback',
+  title: 'Libas e Dastaan Luxury Silk Couture',
+  image: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1000&auto=format&fit=crop&q=80',
+};
+
+const AUTOPLAY_MS = 4000;
+const MAX_SLIDES = 8;
+
 export const HeroBanner = ({
+  products,
   onExploreProducts,
   onNavigateToAdmin,
 }: HeroBannerProps) => {
+  // Featured products first, then the rest; only products that have an image
+  const slides = useMemo(() => {
+    const withImages = products.filter((p) => p.images?.[0]);
+    const ordered = [...withImages.filter((p) => p.is_featured), ...withImages.filter((p) => !p.is_featured)];
+    const list = ordered.slice(0, MAX_SLIDES).map((p) => ({ id: p.id, title: p.title, image: p.images[0] }));
+    return list.length > 0 ? list : [FALLBACK_SLIDE];
+  }, [products]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  // Reset if the product list shrinks
+  useEffect(() => {
+    if (activeIndex >= slides.length) setActiveIndex(0);
+  }, [slides.length, activeIndex]);
+
+  useEffect(() => {
+    if (paused || slides.length < 2) return;
+    const timer = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % slides.length);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(timer);
+  }, [paused, slides.length]);
+
+  const goTo = (index: number) => setActiveIndex((index + slides.length) % slides.length);
+  const currentSlide = slides[activeIndex] ?? slides[0];
+
   return (
     <div className="relative overflow-hidden bg-[#FAF6F0] border-b border-[#D8CEC4] text-[#3B2314]">
       {/* Subtle artisanal watermark background */}
@@ -96,12 +135,57 @@ export const HeroBanner = ({
 
               {/* Main Visual Card */}
               <div className="relative bg-[#FFFDF9] border border-[#D8CEC4] shadow-luxury p-3">
-                <div className="aspect-[4/5] w-full overflow-hidden bg-[#FAF6F0] relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1000&auto=format&fit=crop&q=80"
-                    alt="Libas e Dastaan Luxury Silk Couture"
-                    className="h-full w-full object-cover object-top filter contrast-[1.03]"
-                  />
+                <div
+                  className="aspect-[4/5] w-full overflow-hidden bg-[#FAF6F0] relative group"
+                  onMouseEnter={() => setPaused(true)}
+                  onMouseLeave={() => setPaused(false)}
+                >
+                  {/* Crossfading product slides */}
+                  {slides.map((slide, i) => (
+                    <img
+                      key={slide.id}
+                      src={slide.image}
+                      alt={slide.title}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      className={`absolute inset-0 h-full w-full object-cover object-top filter contrast-[1.03] transition-opacity duration-1000 ease-in-out ${
+                        i === activeIndex ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
+
+                  {/* Prev / Next controls */}
+                  {slides.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => goTo(activeIndex - 1)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-[#FAF6F0]/85 border border-[#D8CEC4] text-[#3B2314] hover:bg-[#FAF6F0] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity rounded-none"
+                        aria-label="Previous product"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => goTo(activeIndex + 1)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-[#FAF6F0]/85 border border-[#D8CEC4] text-[#3B2314] hover:bg-[#FAF6F0] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity rounded-none"
+                        aria-label="Next product"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+
+                      {/* Slide indicators */}
+                      <div className="absolute top-4 left-0 right-0 flex justify-center gap-1.5">
+                        {slides.map((slide, i) => (
+                          <button
+                            key={slide.id}
+                            onClick={() => goTo(i)}
+                            aria-label={`Show ${slide.title}`}
+                            className={`h-[3px] transition-all duration-300 ${
+                              i === activeIndex ? 'w-6 bg-[#9E5A38]' : 'w-3 bg-[#FAF6F0]/80 hover:bg-[#FAF6F0]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
 
                   {/* Corner Brand Seal */}
                   <div className="absolute bottom-4 left-4 right-4 bg-[#FAF6F0]/95 backdrop-blur-sm border border-[#D8CEC4] p-3 text-center">
@@ -114,6 +198,14 @@ export const HeroBanner = ({
                     >
                       خالص ریشم اور دستکاری کا شاہکار
                     </p>
+                    {currentSlide.id !== FALLBACK_SLIDE.id && (
+                      <p
+                        key={currentSlide.id}
+                        className="text-[11px] font-serif italic text-[#9E5A38] mt-1 truncate animate-in fade-in duration-700"
+                      >
+                        {currentSlide.title}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

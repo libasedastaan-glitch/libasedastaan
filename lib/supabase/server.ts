@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const DEFAULT_SUPABASE_URL = 'https://fawanfeqhwrlddflwvjy.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_Arf-6FIXbhsHYW0lIJu6bw_5YmkTe3h';
+const DEFAULT_SUPABASE_URL = '';
+const DEFAULT_SUPABASE_ANON_KEY = '';
 
 // Server-side Supabase client for Next.js Server Components, Server Actions, and Route Handlers
 export const createServerClient = (cookiesStore?: {
